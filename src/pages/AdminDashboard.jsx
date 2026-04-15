@@ -3,8 +3,9 @@ import SeatCard from '../components/SeatCard.jsx'
 import SummaryCard from '../components/SummaryCard.jsx'
 import SessionTable from '../components/SessionTable.jsx'
 
-const WS_URL = 'ws://localhost:8000/ws/seats'
-const API = '/api/v1'
+const API_BASE = import.meta.env.VITE_API_URL || '';
+const API = `${API_BASE}/api/v1`;
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/seats';
 const SUMMARY_INTERVAL_MS = 30_000
 
 export default function AdminDashboard() {

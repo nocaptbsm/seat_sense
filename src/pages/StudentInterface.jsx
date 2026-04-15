@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import SessionTimer from '../components/SessionTimer.jsx'
 
-const API = '/api/v1'
-const WS_URL = 'ws://localhost:8000/ws/seats'
+const API_BASE = import.meta.env.VITE_API_URL || '';
+const API = `${API_BASE}/api/v1`;
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/seats';
 
 const STEP = {
   FORM: 'FORM',
