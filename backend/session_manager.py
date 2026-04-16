@@ -41,9 +41,9 @@ class SessionManager:
         if existing:
             now = datetime.now(timezone.utc)
             duration = int((now - existing.start_time.replace(tzinfo=timezone.utc)).total_seconds())
-            existing.session_status = SessionStatus.replaced
-            existing.end_time = now
-            existing.duration_seconds = duration
+            existing.session_status = SessionStatus.replaced  # type: ignore[assignment]
+            existing.end_time = now  # type: ignore[assignment]
+            existing.duration_seconds = duration  # type: ignore[assignment]
             db.add(existing)
 
             # Log session_replaced event
@@ -80,11 +80,11 @@ class SessionManager:
         # 4. Broadcast
         # The seat physically MUST be occupied already (enforced by routes.py)
         await self._broadcast(
-            seat_id=seat_id,
+            seat_id=seat_id,  # type: ignore[arg-type]
             status="occupied",
             student_id=student_id,
-            session_id=new_session.session_id,
-            start_time=new_session.start_time,
+            session_id=new_session.session_id,  # type: ignore[arg-type]
+            start_time=new_session.start_time,  # type: ignore[arg-type]
         )
 
         return new_session
@@ -111,9 +111,9 @@ class SessionManager:
                 if start.tzinfo is None:
                     start = start.replace(tzinfo=timezone.utc)
                 
-                session.session_status = SessionStatus.ended
-                session.end_time = now
-                session.duration_seconds = int((now - start).total_seconds())
+                session.session_status = SessionStatus.ended  # type: ignore[assignment]
+                session.end_time = now  # type: ignore[assignment]
+                session.duration_seconds = int((now - start).total_seconds())  # type: ignore[assignment]
                 db.add(session)
 
                 event = SeatEvent(
@@ -140,9 +140,9 @@ class SessionManager:
         if start.tzinfo is None:
             start = start.replace(tzinfo=timezone.utc)
 
-        session.session_status = SessionStatus.ended
-        session.end_time = now
-        session.duration_seconds = int((now - start).total_seconds())
+        session.session_status = SessionStatus.ended  # type: ignore[assignment]
+        session.end_time = now  # type: ignore[assignment]
+        session.duration_seconds = int((now - start).total_seconds())  # type: ignore[assignment]
         db.add(session)
 
         event = SeatEvent(
@@ -162,11 +162,11 @@ class SessionManager:
         seat_result = await db.execute(select(Seat).where(Seat.seat_id == session.seat_id))
         actual_seat = seat_result.scalars().first()
         
-        status_str = actual_seat.status.value if hasattr(actual_seat.status, "value") else actual_seat.status
+        status_str = actual_seat.status.value if hasattr(actual_seat.status, "value") else actual_seat.status  # type: ignore[union-attr]
 
         await self._broadcast(
-            seat_id=session.seat_id,
-            status=status_str,
+            seat_id=session.seat_id,  # type: ignore[arg-type]
+            status=status_str,  # type: ignore[arg-type]
             student_id=None,
             session_id=None,
         )

@@ -63,7 +63,7 @@ class Seat(Base):
     esp32_id = Column(Integer, ForeignKey("esp32_devices.esp32_id"), nullable=True)
     sensor_pin = Column(Integer, nullable=True)
     qr_url = Column(String(512), unique=True, nullable=True)
-    status = Column(
+    status: "Column[SeatStatus]" = Column(
         SAEnum(SeatStatus, name="seat_status_enum", create_type=True),
         default=SeatStatus.available,
         nullable=False,
@@ -82,7 +82,7 @@ class Session(Base):
     seat_id = Column(Integer, ForeignKey("seats.seat_id"), nullable=False)
     start_time = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=True)
-    session_status = Column(
+    session_status: "Column[SessionStatus]" = Column(
         SAEnum(SessionStatus, name="session_status_enum", create_type=True),
         default=SessionStatus.active,
         nullable=False,
@@ -100,7 +100,7 @@ class SeatEvent(Base):
     event_id = Column(Integer, primary_key=True, autoincrement=True)
     seat_id = Column(Integer, ForeignKey("seats.seat_id"), nullable=False)
     session_id = Column(Integer, ForeignKey("sessions.session_id"), nullable=True)
-    event_type = Column(
+    event_type: "Column[EventType]" = Column(
         SAEnum(EventType, name="event_type_enum", create_type=True),
         nullable=False,
     )

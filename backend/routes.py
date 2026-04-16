@@ -103,13 +103,13 @@ async def start_session(payload: StartSessionRequest, db: AsyncSession = Depends
     )
 
     return StartSessionResponse(
-        session_id=new_session.session_id,
-        student_id=new_session.student_id,
-        seat_id=new_session.seat_id,
-        start_time=new_session.start_time,
+        session_id=new_session.session_id,  # type: ignore[arg-type]
+        student_id=new_session.student_id,  # type: ignore[arg-type]
+        seat_id=new_session.seat_id,  # type: ignore[arg-type]
+        start_time=new_session.start_time,  # type: ignore[arg-type]
         session_status=new_session.session_status.value
         if hasattr(new_session.session_status, "value")
-        else new_session.session_status,
+        else new_session.session_status,  # type: ignore[arg-type]
     )
 
 
@@ -145,7 +145,7 @@ async def update_seat_status(payload: SeatStatusUpdate, db: AsyncSession = Depen
 
     # Update seat status in DB
     new_status = SeatStatus.occupied if payload.occupied else SeatStatus.available
-    seat.status = new_status
+    seat.status = new_status  # type: ignore[assignment]
     db.add(seat)
 
     # Update ESP32 last_seen if esp32_id provided
@@ -155,7 +155,7 @@ async def update_seat_status(payload: SeatStatusUpdate, db: AsyncSession = Depen
         )
         device: Optional[ESP32Device] = esp_result.scalars().first()
         if device:
-            device.last_seen = datetime.now(timezone.utc)
+            device.last_seen = datetime.now(timezone.utc)  # type: ignore[assignment]
             db.add(device)
 
     await db.flush()
@@ -179,9 +179,9 @@ async def update_seat_status(payload: SeatStatusUpdate, db: AsyncSession = Depen
     await session_manager._broadcast(
         seat_id=payload.seat_id,
         status=new_status.value if hasattr(new_status, "value") else new_status,
-        student_id=active_session.student_id if active_session else None,
-        session_id=active_session.session_id if active_session else None,
-        start_time=active_session.start_time if active_session else None,
+        student_id=active_session.student_id if active_session else None,  # type: ignore[arg-type]
+        session_id=active_session.session_id if active_session else None,  # type: ignore[arg-type]
+        start_time=active_session.start_time if active_session else None,  # type: ignore[arg-type]
     )
 
     return SeatStatusResponse(
