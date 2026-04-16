@@ -5,11 +5,22 @@ from models import Base
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://user:password@localhost:5432/library_db")
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL environment variable is not set. "
+        "Set it in Railway Variables to your PostgreSQL connection string."
+    )
+
+# Normalize URL scheme for asyncpg driver
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+elif not DATABASE_URL.startswith("postgresql+asyncpg://"):
+    raise RuntimeError(
+        f"DATABASE_URL must start with postgres://, postgresql://, or postgresql+asyncpg://. Got: {DATABASE_URL[:30]}..."
+    )
 
 engine = create_async_engine(
     DATABASE_URL,
