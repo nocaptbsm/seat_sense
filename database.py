@@ -52,5 +52,25 @@ async def get_db():
 
 
 async def init_db():
+    from sqlalchemy import select, text
+    from models import Seat, SeatStatus
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    # Seed seats 1 and 2 if they don't already exist
+    async with AsyncSessionLocal() as session:
+        for seat_id in [1, 2]:
+            existing = await session.get(Seat, seat_id)
+            if not existing:
+                # Use raw SQL to insert with explicit seat_id (bypassing autoincrement)
+                await session.execute(
+                    text(
+                        "INSERT INTO seats (seat_id, status) "
+                        "VALUES (:id, :status) "
+                        "ON CONFLICT (seat_id) DO NOTHING"
+                    ),
+                    {"id": seat_id, "status": SeatStatus.available.value},
+                )
+        await session.commit()
+        print("Default seats (1 and 2) ensured in database.")
